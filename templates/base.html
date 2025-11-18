@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PipeVision - Wastewater Infrastructure Monitoring{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background: #fafafa;
+            --foreground: #1a1a1a;
+            --border: #e5e5e5;
+            --card: #f5f5f5;
+            --card-border: #ebebeb;
+            --sidebar: #f0f0f0;
+            --sidebar-border: #e5e5e5;
+            --sidebar-primary: #1976d2;
+            --sidebar-primary-fg: #ffffff;
+            --sidebar-accent: #d9d9d9;
+            --primary: #1976d2;
+            --primary-fg: #ffffff;
+            --secondary: #e5e5e5;
+            --muted: #e8e8e8;
+            --muted-fg: #5c5c5c;
+            --destructive: #c62828;
+            --destructive-fg: #ffffff;
+            --chart-1: #1976d2;
+            --chart-2: #ed6c02;
+            --chart-3: #2e7d32;
+            --chart-4: #9c27b0;
+            --chart-5: #d32f2f;
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--background);
+            color: var(--foreground);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--sidebar-primary);
+            color: var(--sidebar-primary-fg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--muted-fg);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted-fg);
+            padding: 8px 12px;
+            margin-bottom: 4px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: var(--foreground);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--sidebar-accent);
+        }
+
+        .nav-link.active {
+            background: var(--sidebar-accent);
+        }
+
+        .nav-link i {
+            width: 20px;
+            font-size: 16px;
+        }
+
+        .nav-link-content {
+            flex: 1;
+        }
+
+        .nav-link-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-link-desc {
+            font-size: 12px;
+            color: var(--muted-fg);
+        }
+
+        .main-container {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            height: 64px;
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-left h2 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header-left p {
+            font-size: 12px;
+            color: var(--muted-fg);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            background: transparent;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--muted);
+        }
+
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 30px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            color: var(--muted-fg);
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--foreground);
+        }
+
+        .card-icon {
+            color: var(--muted-fg);
+            font-size: 16px;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--muted-fg);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-critical {
+            background: var(--destructive);
+            color: var(--destructive-fg);
+        }
+
+        .badge-high {
+            background: var(--chart-2);
+            color: white;
+        }
+
+        .badge-medium {
+            background: var(--chart-1);
+            color: white;
+        }
+
+        .badge-low {
+            background: var(--secondary);
+            color: var(--foreground);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--muted);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--primary-fg);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--muted);
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: var(--muted);
+        }
+
+        .mono {
+            font-family: var(--font-mono);
+        }
+
+        .text-destructive {
+            color: var(--destructive);
+        }
+
+        .text-success {
+            color: var(--chart-3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-container {
+                margin-left: 0;
+            }
+
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>PipeVision</h1>
+                    <p>Infrastructure Monitor</p>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Navigation</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-th-large"></i>
+                        <div class="nav-link-content">
+                            <div class="nav-link-title">System Overview</div>
+                            <div class="nav-link-desc">Dashboard & analytics</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/map" class="nav-link {% if request.path == '/map' %}active{% endif %}">
+                        <i class="fas fa-map"></i>
+                        <div class="nav-link-content">
+                            <div class="nav-link-title">Map View</div>
+                            <div class="nav-link-desc">Interactive pipe network</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/raw-data" class="nav-link {% if request.path == '/raw-data' %}active{% endif %}">
+                        <i class="fas fa-database"></i>
+                        <div class="nav-link-content">
+                            <div class="nav-link-title">Raw Data</div>
+                            <div class="nav-link-desc">Tier 1: Sensor readings</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/ai-analysis" class="nav-link {% if request.path == '/ai-analysis' %}active{% endif %}">
+                        <i class="fas fa-brain"></i>
+                        <div class="nav-link-content">
+                            <div class="nav-link-title">AI Analysis</div>
+                            <div class="nav-link-desc">Tier 2: AI insights</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/alerts" class="nav-link {% if request.path == '/alerts' %}active{% endif %}">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="nav-link-content">
+                            <div class="nav-link-title">Alerts</div>
+                            <div class="nav-link-desc">High-risk segments</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <header class="top-header">
+            <div class="header-left">
+                <h2>Infrastructure Monitor</h2>
+                <p>Real-time pipeline analytics</p>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            // Theme toggle functionality
+            console.log('Theme toggle clicked');
+        }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

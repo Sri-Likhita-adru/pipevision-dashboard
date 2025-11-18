@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block extra_styles %}
+<style>
+    .alerts-card {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 24px;
+    }
+
+    .alerts-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .table-wrapper {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .badge-with-icon {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .alert-message {
+        font-size: 14px;
+        color: var(--foreground);
+        max-width: 400px;
+    }
+
+    .no-alerts {
+        text-align: center;
+        padding: 48px 24px;
+    }
+
+    .no-alerts i {
+        font-size: 48px;
+        color: var(--muted-fg);
+        opacity: 0.5;
+        margin-bottom: 16px;
+    }
+
+    .no-alerts p {
+        font-size: 16px;
+        color: var(--muted-fg);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>System Alerts</h1>
+    <p>High-priority notifications requiring immediate attention</p>
+</div>
+
+<!-- Summary Metrics -->
+<div class="metric-grid">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Critical Alerts</span>
+            <i class="fas fa-exclamation-triangle card-icon" style="color: var(--destructive);"></i>
+        </div>
+        <div class="metric-value text-destructive" id="critical-count">0</div>
+        <div class="metric-label">Immediate action required</div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">High Priority</span>
+            <i class="fas fa-exclamation-triangle card-icon" style="color: var(--chart-2);"></i>
+        </div>
+        <div class="metric-value" id="high-count">0</div>
+        <div class="metric-label">Needs attention soon</div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Total Active</span>
+            <i class="fas fa-clock card-icon"></i>
+        </div>
+        <div class="metric-value" id="total-count">0</div>
+        <div class="metric-label">All severity levels</div>
+    </div>
+</div>
+
+<!-- Alerts Table -->
+<div class="alerts-card">
+    <h3>Active Alerts</h3>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Severity</th>
+                    <th>Pipe Segment</th>
+                    <th>Message</th>
+                    <th>Timestamp</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="alertsTableBody">
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 48px;">
+                        Loading alerts...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let alerts = [];
+
+    async function loadAlerts() {
+        try {
+            const response = await fetch('/api/alerts');
+            alerts = await response.json();
+
+            updateMetrics();
+            renderAlertsTable();
+        } catch (error) {
+            console.error('Error loading alerts:', error);
+        }
+    }
+
+    function updateMetrics() {
+        const criticalCount = alerts.filter(a => a.severity === 'critical').length;
+        const highCount = alerts.filter(a => a.severity === 'high').length;
+
+        document.getElementById('critical-count').textContent = criticalCount;
+        document.getElementById('high-count').textContent = highCount;
+        document.getElementById('total-count').textContent = alerts.length;
+    }
+
+    function renderAlertsTable() {
+        const tbody = document.getElementById('alertsTableBody');
+
+        if (alerts.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="no-alerts">
+                        <i class="fas fa-check-circle"></i>
+                        <p>No active alerts</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Sort alerts by severity
+        const sortedAlerts = [...alerts].sort((a, b) => {
+            const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+            return severityOrder[b.severity] - severityOrder[a.severity];
+        });
+
+        const severityConfig = {
+            critical: { icon: 'fa-exclamation-triangle', badge: 'badge-critical' },
+            high: { icon: 'fa-exclamation-triangle', badge: 'badge-high' },
+            medium: { icon: 'fa-clock', badge: 'badge-medium' },
+            low: { icon: 'fa-check-circle', badge: 'badge-low' }
+        };
+
+        tbody.innerHTML = sortedAlerts.map(alert => {
+            const config = severityConfig[alert.severity];
+            return `
+                <tr>
+                    <td>
+                        <span class="badge ${config.badge} badge-with-icon">
+                            <i class="fas ${config.icon}"></i>
+                            ${alert.severity.toUpperCase()}
+                        </span>
+                    </td>
+                    <td style="font-weight: 500;">
+                        ${alert.pipeSegmentName}
+                    </td>
+                    <td>
+                        <div class="alert-message">${alert.message}</div>
+                    </td>
+                    <td class="mono" style="font-size: 13px; color: var(--muted-fg);">
+                        ${new Date(alert.timestamp).toLocaleString()}
+                    </td>
+                    <td style="text-align: right;">
+                        <button class="btn" onclick="viewAlertDetails('${alert.id}')">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function viewAlertDetails(alertId) {
+        const alert = alerts.find(a => a.id === alertId);
+        if (alert) {
+            alert(`Alert Details\n\nPipe: ${alert.pipeSegmentName}\nSeverity: ${alert.severity}\n\n${alert.message}`);
+        }
+    }
+
+    // Load alerts on page load
+    loadAlerts();
+</script>
+{% endblock %}

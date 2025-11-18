@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+
+{% block extra_styles %}
+<style>
+    .chart-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-top: 24px;
+    }
+
+    .chart-card {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .chart-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .chart-card p {
+        font-size: 13px;
+        color: var(--muted-fg);
+        margin-bottom: 16px;
+    }
+
+    .chart-container {
+        width: 100%;
+        height: 300px;
+    }
+
+    .activity-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        transition: background-color 0.2s;
+    }
+
+    .activity-item:hover {
+        background: var(--muted);
+    }
+
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .activity-icon.inspection {
+        background: rgba(25, 118, 210, 0.1);
+        color: var(--chart-1);
+    }
+
+    .activity-icon.analysis {
+        background: rgba(237, 108, 2, 0.1);
+        color: var(--chart-2);
+    }
+
+    .activity-icon.alert {
+        background: rgba(198, 40, 40, 0.1);
+        color: var(--destructive);
+    }
+
+    .activity-icon.maintenance {
+        background: rgba(46, 125, 50, 0.1);
+        color: var(--chart-3);
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-content h4 {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .activity-content p {
+        font-size: 12px;
+        color: var(--muted-fg);
+    }
+
+    .activity-badge {
+        font-size: 11px;
+        padding: 2px 8px;
+        background: var(--secondary);
+        border-radius: 4px;
+        align-self: flex-start;
+    }
+
+    @media (max-width: 1024px) {
+        .chart-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>System Overview</h1>
+    <p>Monitor your wastewater infrastructure at a glance</p>
+</div>
+
+<!-- Metric Cards -->
+<div class="metric-grid">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Total Pipe Length</span>
+            <i class="fas fa-ruler card-icon"></i>
+        </div>
+        <div class="metric-value" id="total-length">Loading...</div>
+        <div class="metric-label">Across all segments</div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Average System Age</span>
+            <i class="fas fa-clock card-icon"></i>
+        </div>
+        <div class="metric-value" id="avg-age">Loading...</div>
+        <div class="metric-label">System-wide average</div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Average Quality</span>
+            <i class="fas fa-shield-alt card-icon"></i>
+        </div>
+        <div class="metric-value" id="avg-quality">Loading...</div>
+        <div class="metric-label">Overall condition</div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">High-Risk Segments</span>
+            <i class="fas fa-wrench card-icon"></i>
+        </div>
+        <div class="metric-value text-destructive" id="high-risk">Loading...</div>
+        <div class="metric-label">Require attention</div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="chart-grid">
+    <!-- Quality Distribution -->
+    <div class="chart-card">
+        <h3>Quality Distribution</h3>
+        <p>System-wide pipe quality breakdown</p>
+        <div class="chart-container">
+            <canvas id="qualityChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Age Distribution -->
+    <div class="chart-card">
+        <h3>Age Distribution</h3>
+        <p>Pipe segments by estimated age</p>
+        <div class="chart-container">
+            <canvas id="ageChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Pipe Type Breakdown -->
+    <div class="chart-card">
+        <h3>Pipe Type Breakdown</h3>
+        <p>Material composition of system</p>
+        <div class="chart-container">
+            <canvas id="typeChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="chart-card">
+        <h3>Recent Activity</h3>
+        <p>Latest inspection events</p>
+        <div id="activity-feed" style="max-height: 284px; overflow-y: auto;">
+            Loading...
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Fetch metrics data
+    async function loadDashboard() {
+        try {
+            const [metricsRes, activityRes, segmentsRes] = await Promise.all([
+                fetch('/api/metrics'),
+                fetch('/api/recent-activity'),
+                fetch('/api/pipe-segments')
+            ]);
+
+            const metrics = await metricsRes.json();
+            const activity = await activityRes.json();
+            const segments = await segmentsRes.json();
+
+            // Update metrics
+            document.getElementById('total-length').textContent = metrics.totalPipeLength.toLocaleString() + ' m';
+            document.getElementById('avg-age').textContent = metrics.averageAge.toFixed(1) + ' years';
+            document.getElementById('avg-quality').textContent = metrics.averageQuality;
+            document.getElementById('high-risk').textContent = metrics.highRiskSegments;
+
+            // Quality Distribution Chart
+            const qualityCtx = document.getElementById('qualityChart').getContext('2d');
+            new Chart(qualityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Great', 'Good', 'Fair', 'Poor'],
+                    datasets: [{
+                        data: [
+                            metrics.qualityBreakdown.great,
+                            metrics.qualityBreakdown.good,
+                            metrics.qualityBreakdown.fair,
+                            metrics.qualityBreakdown.poor
+                        ],
+                        backgroundColor: [
+                            'rgb(46, 125, 50)',
+                            'rgb(25, 118, 210)',
+                            'rgb(237, 108, 2)',
+                            'rgb(211, 47, 47)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Age Distribution Chart
+            const ageData = [
+                { range: '0-10 years', count: segments.filter(p => p.estimatedAge < 10).length },
+                { range: '10-20 years', count: segments.filter(p => p.estimatedAge >= 10 && p.estimatedAge < 20).length },
+                { range: '20-30 years', count: segments.filter(p => p.estimatedAge >= 20 && p.estimatedAge < 30).length },
+                { range: '30+ years', count: segments.filter(p => p.estimatedAge >= 30).length }
+            ];
+
+            const ageCtx = document.getElementById('ageChart').getContext('2d');
+            new Chart(ageCtx, {
+                type: 'bar',
+                data: {
+                    labels: ageData.map(d => d.range),
+                    datasets: [{
+                        label: 'Segments',
+                        data: ageData.map(d => d.count),
+                        backgroundColor: 'rgb(25, 118, 210)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Pipe Type Chart
+            const typeCtx = document.getElementById('typeChart').getContext('2d');
+            new Chart(typeCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(metrics.pipeTypeBreakdown),
+                    datasets: [{
+                        label: 'Count',
+                        data: Object.values(metrics.pipeTypeBreakdown),
+                        backgroundColor: 'rgb(237, 108, 2)'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Recent Activity Feed
+            const activityFeed = document.getElementById('activity-feed');
+            activityFeed.innerHTML = activity.slice(0, 5).map(item => {
+                const icons = {
+                    'inspection': 'fa-eye',
+                    'analysis': 'fa-chart-line',
+                    'alert': 'fa-exclamation-circle',
+                    'maintenance': 'fa-wrench'
+                };
+
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon ${item.activityType}">
+                            <i class="fas ${icons[item.activityType]}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>${item.description}</h4>
+                            <p>${new Date(item.timestamp).toLocaleString()}</p>
+                        </div>
+                        <div class="activity-badge">${item.activityType}</div>
+                    </div>
+                `;
+            }).join('');
+
+        } catch (error) {
+            console.error('Error loading dashboard:', error);
+        }
+    }
+
+    loadDashboard();
+</script>
+{% endblock %}

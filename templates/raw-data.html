@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block extra_styles %}
+<style>
+    .filter-card {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .filter-card h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 250px;
+        position: relative;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted-fg);
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 12px 10px 38px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: var(--font-sans);
+        background: var(--background);
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .select-wrapper {
+        position: relative;
+    }
+
+    .select-wrapper select {
+        padding: 10px 36px 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: var(--font-sans);
+        background: var(--background);
+        cursor: pointer;
+        appearance: none;
+    }
+
+    .select-wrapper i {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--muted-fg);
+    }
+
+    .data-card {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .data-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .data-card-header h3 {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .record-count {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        padding: 4px 12px;
+        background: var(--secondary);
+        border-radius: 6px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+    }
+
+    .camera-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+        background: transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .camera-btn:hover {
+        background: var(--muted);
+    }
+
+    .camera-btn i {
+        color: var(--chart-1);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--muted-fg);
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Raw Data View</h1>
+    <p>Tier 1: Direct sensor readings from robot collection</p>
+</div>
+
+<!-- Filter Card -->
+<div class="filter-card">
+    <h3>
+        <i class="fas fa-filter"></i>
+        Filter & Export
+    </h3>
+    <div class="filter-controls">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by pipe segment...">
+        </div>
+        <div class="select-wrapper">
+            <select id="filterType">
+                <option value="all">All Sensors</option>
+                <option value="temperature">Temperature</option>
+                <option value="flow">Flow Rate</option>
+                <option value="sound">Sound Level</option>
+            </select>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <button class="btn" onclick="exportData()">
+            <i class="fas fa-download"></i>
+            Export CSV
+        </button>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="data-card">
+    <div class="data-card-header">
+        <h3>Sensor Readings</h3>
+        <span class="record-count" id="recordCount">0 records</span>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Pipe Segment</th>
+                    <th style="text-align: right;">Temperature (°C)</th>
+                    <th style="text-align: right;">Sound (dB)</th>
+                    <th style="text-align: right;">Flow Rate (L/s)</th>
+                    <th style="text-align: center;">Camera</th>
+                </tr>
+            </thead>
+            <tbody id="dataTableBody">
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 48px;">
+                        Loading data...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let allReadings = [];
+    let pipeSegments = [];
+    let filteredReadings = [];
+
+    async function loadData() {
+        try {
+            const [readingsRes, segmentsRes] = await Promise.all([
+                fetch('/api/sensor-readings'),
+                fetch('/api/pipe-segments')
+            ]);
+
+            allReadings = await readingsRes.json();
+            pipeSegments = await segmentsRes.json();
+            
+            filteredReadings = allReadings;
+            renderTable();
+        } catch (error) {
+            console.error('Error loading data:', error);
+        }
+    }
+
+    function getPipeName(pipeSegmentId) {
+        const pipe = pipeSegments.find(p => p.id === pipeSegmentId);
+        return pipe ? pipe.name : 'Unknown';
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('dataTableBody');
+        const recordCount = document.getElementById('recordCount');
+
+        if (filteredReadings.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No sensor readings found</p>
+                    </td>
+                </tr>
+            `;
+            recordCount.textContent = '0 records';
+            return;
+        }
+
+        const displayReadings = filteredReadings.slice(0, 100);
+        
+        tbody.innerHTML = displayReadings.map(reading => `
+            <tr>
+                <td class="mono" style="font-size: 13px;">
+                    ${new Date(reading.timestamp).toLocaleString()}
+                </td>
+                <td style="font-weight: 500;">
+                    ${getPipeName(reading.pipeSegmentId)}
+                </td>
+                <td class="mono" style="text-align: right;">
+                    ${parseFloat(reading.temperature).toFixed(1)}
+                </td>
+                <td class="mono" style="text-align: right;">
+                    ${parseFloat(reading.soundLevel).toFixed(1)}
+                </td>
+                <td class="mono" style="text-align: right;">
+                    ${parseFloat(reading.flowRate).toFixed(2)}
+                </td>
+                <td style="text-align: center;">
+                    ${reading.cameraImageUrl 
+                        ? '<button class="camera-btn"><i class="fas fa-camera"></i></button>'
+                        : '<span style="color: var(--muted-fg);">—</span>'
+                    }
+                </td>
+            </tr>
+        `).join('');
+
+        recordCount.textContent = `${filteredReadings.length} records`;
+    }
+
+    function filterData() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const filterType = document.getElementById('filterType').value;
+
+        filteredReadings = allReadings.filter(reading => {
+            const pipeName = getPipeName(reading.pipeSegmentId).toLowerCase();
+            const matchesSearch = pipeName.includes(searchTerm);
+            
+            // For now, we're not filtering by type since all readings have all sensor types
+            return matchesSearch;
+        });
+
+        renderTable();
+    }
+
+    function exportData() {
+        // Create CSV content
+        let csv = 'Timestamp,Pipe Segment,Temperature (°C),Sound (dB),Flow Rate (L/s),Camera Image\n';
+        
+        filteredReadings.forEach(reading => {
+            csv += `"${new Date(reading.timestamp).toLocaleString()}",`;
+            csv += `"${getPipeName(reading.pipeSegmentId)}",`;
+            csv += `${reading.temperature},`;
+            csv += `${reading.soundLevel},`;
+            csv += `${reading.flowRate},`;
+            csv += `${reading.cameraImageUrl ? 'Yes' : 'No'}\n`;
+        });
+
+        // Create download link
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sensor-readings-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    // Event listeners
+    document.getElementById('searchInput').addEventListener('input', filterData);
+    document.getElementById('filterType').addEventListener('change', filterData);
+
+    // Load data on page load
+    loadData();
+</script>
+{% endblock %}
