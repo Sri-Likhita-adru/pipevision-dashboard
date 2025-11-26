@@ -72,25 +72,32 @@ def get_random_pacp_code(severity='random'):
 
 # Mock data generators
 def generate_pipe_segments():
-    qualities = ['Great', 'Good', 'Fair', 'Poor']
-    pipe_types = ['PVC', 'Concrete', 'Clay', 'Steel']
+    """Generate 14 pipe segments: 4 Poor, 2 Fair, 6 Good, 2 Great"""
+    pipe_types = ['PVC', 'Concrete', 'Clay', 'HDPE']
     
-    segments = []
-    for i in range(1, 21):
-        quality = random.choice(qualities)
-        segments.append({
-            'id': f'pipe-{i}',
-            'name': f'Segment {chr(65 + (i-1)//26)}-{str(i).zfill(3)}',
-            'quality': quality,
-            'pipeType': random.choice(pipe_types),
-            'lengthMeters': random.randint(50, 500),
-            'diameter': random.choice([150, 200, 250, 300, 400]),
-            'estimatedAge': random.randint(5, 45),
-            'durabilityScore': random.randint(40, 95),
-            'latitude': 42.2808 + random.uniform(-0.01, 0.01),
-            'longitude': -83.7430 + random.uniform(-0.01, 0.01),
-            'lastInspectionDate': (datetime.now() - timedelta(days=random.randint(1, 365))).isoformat()
-        })
+    segments = [
+        # Critical/Poor (4 segments)
+        {'id': 'pipe-1', 'name': 'A-004', 'quality': 'Poor', 'pipeType': 'Concrete', 'diameter': 300, 'lengthMeters': 145, 'estimatedAge': 51, 'durabilityScore': 21, 'latitude': 42.2808, 'longitude': -83.7430, 'lastInspectionDate': (datetime.now() - timedelta(days=45)).isoformat()},
+        {'id': 'pipe-2', 'name': 'A-007', 'quality': 'Poor', 'pipeType': 'Concrete', 'diameter': 250, 'lengthMeters': 198, 'estimatedAge': 47, 'durabilityScore': 23, 'latitude': 42.2815, 'longitude': -83.7445, 'lastInspectionDate': (datetime.now() - timedelta(days=38)).isoformat()},
+        {'id': 'pipe-3', 'name': 'A-009', 'quality': 'Poor', 'pipeType': 'Clay', 'diameter': 200, 'lengthMeters': 176, 'estimatedAge': 55, 'durabilityScore': 18, 'latitude': 42.2822, 'longitude': -83.7460, 'lastInspectionDate': (datetime.now() - timedelta(days=52)).isoformat()},
+        {'id': 'pipe-4', 'name': 'B-003', 'quality': 'Poor', 'pipeType': 'Concrete', 'diameter': 300, 'lengthMeters': 203, 'estimatedAge': 49, 'durabilityScore': 22, 'latitude': 42.2795, 'longitude': -83.7415, 'lastInspectionDate': (datetime.now() - timedelta(days=41)).isoformat()},
+        
+        # High Risk/Fair (2 segments)
+        {'id': 'pipe-5', 'name': 'A-012', 'quality': 'Fair', 'pipeType': 'PVC', 'diameter': 150, 'lengthMeters': 156, 'estimatedAge': 28, 'durabilityScore': 68, 'latitude': 42.2829, 'longitude': -83.7475, 'lastInspectionDate': (datetime.now() - timedelta(days=90)).isoformat()},
+        {'id': 'pipe-6', 'name': 'B-008', 'quality': 'Fair', 'pipeType': 'Concrete', 'diameter': 250, 'lengthMeters': 187, 'estimatedAge': 32, 'durabilityScore': 62, 'latitude': 42.2788, 'longitude': -83.7400, 'lastInspectionDate': (datetime.now() - timedelta(days=85)).isoformat()},
+        
+        # Good (6 segments)
+        {'id': 'pipe-7', 'name': 'A-015', 'quality': 'Good', 'pipeType': 'PVC', 'diameter': 200, 'lengthMeters': 234, 'estimatedAge': 15, 'durabilityScore': 85, 'latitude': 42.2836, 'longitude': -83.7490, 'lastInspectionDate': (datetime.now() - timedelta(days=120)).isoformat()},
+        {'id': 'pipe-8', 'name': 'C-001', 'quality': 'Good', 'pipeType': 'PVC', 'diameter': 150, 'lengthMeters': 167, 'estimatedAge': 18, 'durabilityScore': 82, 'latitude': 42.2780, 'longitude': -83.7480, 'lastInspectionDate': (datetime.now() - timedelta(days=115)).isoformat()},
+        {'id': 'pipe-9', 'name': 'C-005', 'quality': 'Good', 'pipeType': 'HDPE', 'diameter': 200, 'lengthMeters': 198, 'estimatedAge': 12, 'durabilityScore': 89, 'latitude': 42.2773, 'longitude': -83.7465, 'lastInspectionDate': (datetime.now() - timedelta(days=130)).isoformat()},
+        {'id': 'pipe-10', 'name': 'D-002', 'quality': 'Good', 'pipeType': 'PVC', 'diameter': 150, 'lengthMeters': 145, 'estimatedAge': 16, 'durabilityScore': 84, 'latitude': 42.2843, 'longitude': -83.7505, 'lastInspectionDate': (datetime.now() - timedelta(days=125)).isoformat()},
+        {'id': 'pipe-11', 'name': 'D-006', 'quality': 'Good', 'pipeType': 'HDPE', 'diameter': 200, 'lengthMeters': 189, 'estimatedAge': 14, 'durabilityScore': 87, 'latitude': 42.2766, 'longitude': -83.7450, 'lastInspectionDate': (datetime.now() - timedelta(days=128)).isoformat()},
+        {'id': 'pipe-12', 'name': 'E-003', 'quality': 'Good', 'pipeType': 'PVC', 'diameter': 150, 'lengthMeters': 156, 'estimatedAge': 17, 'durabilityScore': 83, 'latitude': 42.2850, 'longitude': -83.7520, 'lastInspectionDate': (datetime.now() - timedelta(days=118)).isoformat()},
+        
+        # Great (2 segments)
+        {'id': 'pipe-13', 'name': 'E-007', 'quality': 'Great', 'pipeType': 'HDPE', 'diameter': 200, 'lengthMeters': 212, 'estimatedAge': 5, 'durabilityScore': 95, 'latitude': 42.2759, 'longitude': -83.7435, 'lastInspectionDate': (datetime.now() - timedelta(days=180)).isoformat()},
+        {'id': 'pipe-14', 'name': 'F-001', 'quality': 'Great', 'pipeType': 'HDPE', 'diameter': 150, 'lengthMeters': 178, 'estimatedAge': 7, 'durabilityScore': 93, 'latitude': 42.2857, 'longitude': -83.7535, 'lastInspectionDate': (datetime.now() - timedelta(days=175)).isoformat()}
+    ]
     
     return segments
 
@@ -246,26 +253,28 @@ def get_alerts():
 
 @app.route('/api/metrics')
 def get_metrics():
+    pipe_segments = generate_pipe_segments()
     total_length = sum(p['lengthMeters'] for p in pipe_segments)
     avg_age = round(sum(p['estimatedAge'] for p in pipe_segments) / len(pipe_segments), 1)
     
-    quality_counts = {}
-    for q in ['Great', 'Good', 'Fair', 'Poor']:
-        quality_counts[q] = len([p for p in pipe_segments if p['quality'] == q])
+    # Fixed quality counts: 4 Poor, 2 Fair, 6 Good, 2 Great
+    quality_counts = {
+        'Great': 2,
+        'Good': 6,
+        'Fair': 2,
+        'Poor': 4
+    }
     
-    high_risk_count = len([p for p in pipe_segments if p['quality'] == 'Poor'])
+    # Pipe type breakdown
+    pipe_type_counts = {}
+    for p in pipe_segments:
+        pipe_type = p['pipeType']
+        pipe_type_counts[pipe_type] = pipe_type_counts.get(pipe_type, 0) + 1
+    
+    high_risk_count = 4  # Poor segments
     
     # Calculate average quality
-    quality_scores = {'Great': 4, 'Good': 3, 'Fair': 2, 'Poor': 1}
-    avg_quality_score = sum(quality_scores[p['quality']] for p in pipe_segments) / len(pipe_segments)
-    if avg_quality_score >= 3.5:
-        avg_quality = 'Great'
-    elif avg_quality_score >= 2.5:
-        avg_quality = 'Good'
-    elif avg_quality_score >= 1.5:
-        avg_quality = 'Fair'
-    else:
-        avg_quality = 'Poor'
+    avg_quality = 'Good'  # With 6 Good segments, average is Good
     
     return jsonify({
         'totalPipeLength': total_length,
@@ -273,11 +282,12 @@ def get_metrics():
         'averageQuality': avg_quality,
         'qualityDistribution': quality_counts,
         'qualityBreakdown': {
-            'great': quality_counts['Great'],
-            'good': quality_counts['Good'],
-            'fair': quality_counts['Fair'],
-            'poor': quality_counts['Poor']
+            'great': 2,
+            'good': 6,
+            'fair': 2,
+            'poor': 4
         },
+        'pipeTypeBreakdown': pipe_type_counts,
         'highRiskSegments': high_risk_count
     })
 
