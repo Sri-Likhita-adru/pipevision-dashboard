@@ -174,10 +174,6 @@ def raw_data():
 def ai_analysis_view():
     return render_template('ai-analysis.html')
 
-@app.route('/alerts')
-def alerts_view():
-    return render_template('alerts.html')
-
 # API Routes
 @app.route('/api/pipe-segments')
 def api_pipe_segments():
