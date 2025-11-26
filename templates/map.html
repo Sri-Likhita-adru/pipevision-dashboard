@@ -19,14 +19,8 @@
         display: grid;
         grid-template-columns: 300px 1fr;
         gap: 24px;
-        height: calc(100vh - 200px);
-    }
-
-    .map-sidebar {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        overflow-y: auto;
+        height: calc(100vh - 320px);
+        margin-bottom: 24px;
     }
 
     .map-legend {
@@ -34,6 +28,7 @@
         border: 1px solid var(--card-border);
         border-radius: 8px;
         padding: 20px;
+        overflow-y: auto;
     }
 
     .map-legend h3 {
@@ -102,73 +97,154 @@
         font-weight: 500;
     }
 
-    /* Active Alerts Section */
+    /* Active Alerts Section - Full Width */
+    .alerts-section {
+        width: 100%;
+    }
+
     .alerts-card {
         background: var(--card);
         border: 1px solid var(--card-border);
         border-radius: 8px;
-        padding: 20px;
+        padding: 24px;
+    }
+
+    .alerts-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
     }
 
     .alerts-card h3 {
-        font-size: 16px;
+        font-size: 18px;
         font-weight: 600;
-        margin-bottom: 16px;
+        margin: 0;
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
+    .alerts-count {
+        font-size: 14px;
+        color: var(--muted-fg);
+        font-weight: normal;
+    }
+
+    .alerts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 12px;
+    }
+
     .alert-item {
-        padding: 12px;
+        padding: 16px;
         border: 1px solid var(--border);
         border-radius: 6px;
-        margin-bottom: 8px;
         cursor: pointer;
-        transition: background-color 0.2s;
+        transition: all 0.2s;
+        background: var(--background);
     }
 
     .alert-item:hover {
         background: var(--muted);
-    }
-
-    .alert-item:last-child {
-        margin-bottom: 0;
+        border-color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .alert-header {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
     }
 
     .alert-segment {
-        font-size: 13px;
-        font-weight: 500;
+        font-size: 14px;
+        font-weight: 600;
+        flex: 1;
+    }
+
+    .alert-pacp {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 6px;
+        background: rgba(25, 118, 210, 0.1);
+        color: var(--primary);
+        border-radius: 3px;
+        margin-left: auto;
     }
 
     .alert-message {
-        font-size: 12px;
+        font-size: 13px;
         color: var(--muted-fg);
-        margin-bottom: 4px;
-        white-space: nowrap;
+        margin-bottom: 8px;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
         overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
+    }
+
+    .alert-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
     }
 
     .alert-time {
-        font-size: 11px;
+        font-size: 12px;
         color: var(--muted-fg);
         font-family: var(--font-mono);
     }
 
+    .alert-action {
+        font-size: 12px;
+        color: var(--primary);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .alert-action i {
+        font-size: 10px;
+    }
+
+    .alert-confidence {
+        font-size: 11px;
+        font-family: var(--font-mono);
+        padding: 3px 6px;
+        border-radius: 3px;
+        font-weight: 600;
+    }
+
+    .alert-confidence.high {
+        background: rgba(46, 125, 50, 0.15);
+        color: #2e7d32;
+    }
+
+    .alert-confidence.medium {
+        background: rgba(237, 108, 2, 0.15);
+        color: #ed6c02;
+    }
+
     .no-alerts {
         text-align: center;
-        padding: 24px;
+        padding: 48px;
         color: var(--muted-fg);
-        font-size: 13px;
+        font-size: 14px;
+    }
+
+    .no-alerts i {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.3;
     }
 
     .map-container-card {
@@ -240,12 +316,17 @@
             height: auto;
         }
 
-        .map-sidebar {
+        .map-legend {
             height: auto;
+            max-height: 300px;
         }
 
         .map-container-card {
             height: 500px;
+        }
+
+        .alerts-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -258,6 +339,14 @@
         <p>Interactive visualization of wastewater infrastructure</p>
     </div>
     <div class="map-controls-right">
+        <button class="btn btn-secondary" onclick="exportGISData()">
+            <i class="fas fa-map-marked-alt"></i>
+            Export GIS Data
+        </button>
+        <button class="btn btn-secondary" onclick="exportPACPReport()">
+            <i class="fas fa-file-csv"></i>
+            Export PACP Report
+        </button>
         <button class="btn" onclick="zoomIn()">
             <i class="fas fa-plus"></i>
         </button>
@@ -271,50 +360,36 @@
 </div>
 
 <div class="map-layout">
-    <!-- Sidebar with Legend and Alerts -->
-    <div class="map-sidebar">
-        <!-- Map Legend -->
-        <div class="map-legend">
-            <h3>
-                <i class="fas fa-layer-group"></i>
-                Map Legend
-            </h3>
+    <!-- Map Legend -->
+    <div class="map-legend">
+        <h3>
+            <i class="fas fa-layer-group"></i>
+            Map Legend
+        </h3>
 
-            <div class="legend-section">
-                <h4>Pipe Quality</h4>
-                <div class="legend-item">
-                    <div class="legend-color great"></div>
-                    <span class="legend-label">Great</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color good"></div>
-                    <span class="legend-label">Good</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color fair"></div>
-                    <span class="legend-label">Fair</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color poor"></div>
-                    <span class="legend-label">Poor</span>
-                </div>
+        <div class="legend-section">
+            <h4>Pipe Quality</h4>
+            <div class="legend-item">
+                <div class="legend-color great"></div>
+                <span class="legend-label">Great</span>
             </div>
-
-            <div class="legend-section">
-                <h4>System Stats</h4>
-                <div id="map-stats">
-                    Loading...
-                </div>
+            <div class="legend-item">
+                <div class="legend-color good"></div>
+                <span class="legend-label">Good</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color fair"></div>
+                <span class="legend-label">Fair</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color poor"></div>
+                <span class="legend-label">Poor</span>
             </div>
         </div>
 
-        <!-- Active Alerts -->
-        <div class="alerts-card">
-            <h3>
-                <i class="fas fa-exclamation-triangle"></i>
-                Active Alerts
-            </h3>
-            <div id="alerts-list">
+        <div class="legend-section">
+            <h4>System Stats</h4>
+            <div id="map-stats">
                 Loading...
             </div>
         </div>
@@ -323,6 +398,22 @@
     <!-- Map -->
     <div class="map-container-card">
         <div id="map"></div>
+    </div>
+</div>
+
+<!-- Active Alerts - Full Width Below -->
+<div class="alerts-section">
+    <div class="alerts-card">
+        <div class="alerts-header">
+            <h3>
+                <i class="fas fa-exclamation-triangle"></i>
+                Active Alerts
+                <span class="alerts-count" id="alerts-count"></span>
+            </h3>
+        </div>
+        <div class="alerts-grid" id="alerts-list">
+            Loading...
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -501,23 +592,36 @@
 
     function renderAlerts() {
         const alertsList = document.getElementById('alerts-list');
+        const alertsCount = document.getElementById('alerts-count');
 
         if (!alerts || alerts.length === 0) {
-            alertsList.innerHTML = '<div class="no-alerts">No active alerts</div>';
+            alertsList.innerHTML = `
+                <div class="no-alerts">
+                    <i class="fas fa-check-circle"></i>
+                    <div>No active alerts</div>
+                </div>
+            `;
+            alertsCount.textContent = '(0)';
             return;
         }
 
-        // Sort by severity and show top 5
+        // Sort by severity
         const sortedAlerts = [...alerts].sort((a, b) => {
             const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
             return severityOrder[b.severity] - severityOrder[a.severity];
-        }).slice(0, 5);
+        });
+
+        alertsCount.textContent = `(${sortedAlerts.length})`;
 
         alertsList.innerHTML = sortedAlerts.map(alert => {
             const config = severityConfig[alert.severity];
             
             // Find the pipe for this alert to zoom to it
             const pipe = pipeSegments.find(p => p.id === alert.pipeSegmentId);
+            
+            // Confidence badge
+            const confidencePercent = (alert.confidence * 100).toFixed(0);
+            const confidenceClass = alert.confidence > 0.85 ? 'high' : 'medium';
             
             return `
                 <div class="alert-item" onclick='zoomToAlert(${JSON.stringify(pipe)})'>
@@ -527,9 +631,18 @@
                             ${alert.severity.toUpperCase()}
                         </span>
                         <span class="alert-segment">${alert.pipeSegmentName}</span>
+                        <span class="alert-pacp">PACP: ${alert.pacp_code}</span>
                     </div>
                     <div class="alert-message">${alert.message}</div>
-                    <div class="alert-time">${new Date(alert.timestamp).toLocaleString()}</div>
+                    <div class="alert-footer">
+                        <div class="alert-time">${new Date(alert.timestamp).toLocaleString()}</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="alert-confidence ${confidenceClass}">${confidencePercent}% ✓</span>
+                            <div class="alert-action">
+                                View on map <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -560,6 +673,76 @@
 
     function resetView() {
         map.setView([42.2808, -83.7430], 13);
+    }
+
+    function exportGISData() {
+        // Export as GeoJSON
+        const geojson = {
+            "type": "FeatureCollection",
+            "features": pipeSegments.map(pipe => ({
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [pipe.longitude, pipe.latitude]
+                },
+                "properties": {
+                    "segment": pipe.name,
+                    "quality": pipe.quality,
+                    "pipe_type": pipe.pipeType,
+                    "diameter": pipe.diameter,
+                    "age": pipe.estimatedAge,
+                    "durability": pipe.durabilityScore
+                }
+            }))
+        };
+
+        const blob = new Blob([JSON.stringify(geojson, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pipevision-gis-data.geojson';
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        alert('✅ GIS Data Exported!\n\nFormat: GeoJSON\nCompatible with: ArcGIS, QGIS, Leaflet\n\nFile includes all pipe locations and metadata.');
+    }
+
+    function exportPACPReport() {
+        // Export alerts with PACP codes
+        const headers = ['Segment', 'Date', 'Severity', 'PACP_Code', 'PACP_Score', 'Message', 'Confidence', 'Latitude', 'Longitude'];
+        
+        const rows = alerts.map(alert => {
+            const pipe = pipeSegments.find(p => p.id === alert.pipeSegmentId);
+            return [
+                alert.pipeSegmentName,
+                new Date(alert.timestamp).toISOString().split('T')[0],
+                alert.severity,
+                alert.pacp_code,
+                alert.pacp_score,
+                `"${alert.message}"`,
+                (alert.confidence * 100).toFixed(2),
+                pipe ? pipe.latitude : '',
+                pipe ? pipe.longitude : ''
+            ];
+        });
+
+        const csv = [
+            '# PipeVision PACP Report',
+            '# Generated: ' + new Date().toISOString(),
+            '# PACP 7.0 Compliant',
+            headers.join(','),
+            ...rows.map(row => row.join(','))
+        ].join('\n');
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pipevision-pacp-report.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        alert('✅ PACP Report Exported!\n\nFormat: CSV with PACP codes\nReady for: ARGON import\n\nIncludes GPS coordinates for GIS mapping.');
     }
 
     // Initialize map when page loads

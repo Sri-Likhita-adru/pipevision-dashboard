@@ -109,9 +109,21 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>System Overview</h1>
-    <p>Monitor your wastewater infrastructure at a glance</p>
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+    <div>
+        <h1>System Overview</h1>
+        <p>Monitor your wastewater infrastructure at a glance</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        <button class="btn" onclick="exportSystemReport()">
+            <i class="fas fa-file-pdf"></i>
+            Export System Report
+        </button>
+        <button class="btn btn-secondary" onclick="exportMetrics()">
+            <i class="fas fa-file-excel"></i>
+            Export Metrics
+        </button>
+    </div>
 </div>
 
 <!-- Metric Cards -->
@@ -341,6 +353,40 @@
         } catch (error) {
             console.error('Error loading dashboard:', error);
         }
+    }
+
+    // Export functions
+    function exportSystemReport() {
+        alert('🔄 Generating System Report...\n\nReport will include:\n• System metrics and KPIs\n• Quality distribution analysis\n• Age distribution breakdown\n• Recent activity timeline\n• PACP compliance summary\n\nFormat: PDF\n\n(In production, this would generate a PDF using jsPDF library)');
+    }
+
+    function exportMetrics() {
+        // Create Excel-compatible CSV
+        const totalLength = document.getElementById('total-length').textContent;
+        const avgAge = document.getElementById('avg-age').textContent;
+        const highRisk = document.getElementById('high-risk').textContent;
+
+        const csv = [
+            '# PipeVision System Metrics',
+            '# Generated: ' + new Date().toISOString(),
+            '',
+            'Metric,Value',
+            `"Total Pipe Length (m)","${totalLength}"`,
+            `"Average Age (years)","${avgAge}"`,
+            `"High-Risk Segments","${highRisk}"`,
+            '',
+            '# Quality Distribution',
+            'Quality,Count',
+            // Quality data populated from charts
+        ].join('\n');
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pipevision-system-metrics.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 
     loadDashboard();

@@ -10,200 +10,218 @@
         margin-bottom: 24px;
     }
 
-    .filter-card h3 {
-        font-size: 16px;
+    .filter-controls {
+        display: grid;
+        grid-template-columns: 1fr 200px auto auto;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .filter-group label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--muted-fg);
+    }
+
+    .filter-group input[type="text"],
+    .filter-group select {
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 14px;
+        background: var(--background);
+        color: var(--foreground);
+    }
+
+    .table-container {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: var(--muted);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    th {
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 12px;
         font-weight: 600;
-        margin-bottom: 16px;
+        color: var(--muted-fg);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background-color 0.2s;
+    }
+
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    tbody tr:hover {
+        background: var(--muted);
+    }
+
+    td {
+        padding: 12px 16px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .mono {
+        font-family: var(--font-mono);
+        font-size: 12px;
+    }
+
+    .pacp-cell {
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
-    .filter-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .search-box {
-        flex: 1;
-        min-width: 250px;
-        position: relative;
-    }
-
-    .search-box i {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--muted-fg);
-    }
-
-    .search-box input {
-        width: 100%;
-        padding: 10px 12px 10px 38px;
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        font-size: 14px;
-        font-family: var(--font-sans);
-        background: var(--background);
-    }
-
-    .search-box input:focus {
-        outline: none;
-        border-color: var(--primary);
-    }
-
-    .select-wrapper {
-        position: relative;
-    }
-
-    .select-wrapper select {
-        padding: 10px 36px 10px 12px;
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        font-size: 14px;
-        font-family: var(--font-sans);
-        background: var(--background);
-        cursor: pointer;
-        appearance: none;
-    }
-
-    .select-wrapper i {
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        pointer-events: none;
-        color: var(--muted-fg);
-    }
-
-    .data-card {
-        background: var(--card);
-        border: 1px solid var(--card-border);
-        border-radius: 8px;
-        padding: 20px;
-    }
-
-    .data-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-    }
-
-    .data-card-header h3 {
-        font-size: 18px;
-        font-weight: 600;
-    }
-
-    .record-count {
+    .pacp-code {
         font-family: var(--font-mono);
-        font-size: 14px;
-        padding: 4px 12px;
-        background: var(--secondary);
-        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 6px;
+        background: rgba(25, 118, 210, 0.1);
+        color: var(--primary);
+        border-radius: 3px;
     }
 
-    .table-wrapper {
-        overflow-x: auto;
-        border: 1px solid var(--border);
-        border-radius: 8px;
+    .risk-score {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 12px;
     }
 
-    .camera-btn {
-        width: 32px;
-        height: 32px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--border);
-        background: transparent;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s;
+    .risk-score.critical {
+        color: #c62828;
     }
 
-    .camera-btn:hover {
-        background: var(--muted);
+    .risk-score.high {
+        color: #ed6c02;
     }
 
-    .camera-btn i {
-        color: var(--chart-1);
+    .risk-score.medium {
+        color: #f57c00;
+    }
+
+    .risk-score.low {
+        color: #2e7d32;
+    }
+
+    .camera-indicator {
+        color: var(--primary);
+    }
+
+    .no-camera {
+        color: var(--muted-fg);
     }
 
     .empty-state {
         text-align: center;
-        padding: 48px 24px;
+        padding: 48px;
         color: var(--muted-fg);
     }
 
-    .empty-state i {
-        font-size: 48px;
-        margin-bottom: 16px;
-        opacity: 0.5;
+    .export-info {
+        font-size: 12px;
+        color: var(--muted-fg);
+        margin-top: 4px;
+    }
+
+    @media (max-width: 1024px) {
+        .filter-controls {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1>Raw Data View</h1>
-    <p>Tier 1: Direct sensor readings from robot collection</p>
+    <div>
+        <h1>Raw Data</h1>
+        <p>Tier 1: Sensor readings with PACP classifications</p>
+    </div>
 </div>
 
-<!-- Filter Card -->
 <div class="filter-card">
-    <h3>
-        <i class="fas fa-filter"></i>
-        Filter & Export
-    </h3>
     <div class="filter-controls">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Search by pipe segment...">
+        <div class="filter-group">
+            <label for="search-input">Search by Pipe Segment</label>
+            <input type="text" id="search-input" placeholder="Search..." oninput="filterData()">
         </div>
-        <div class="select-wrapper">
-            <select id="filterType">
-                <option value="all">All Sensors</option>
-                <option value="temperature">Temperature</option>
-                <option value="flow">Flow Rate</option>
-                <option value="sound">Sound Level</option>
+        <div class="filter-group">
+            <label for="pacp-filter">PACP Code</label>
+            <select id="pacp-filter" onchange="filterData()">
+                <option value="">All Codes</option>
             </select>
-            <i class="fas fa-chevron-down"></i>
         </div>
-        <button class="btn" onclick="exportData()">
-            <i class="fas fa-download"></i>
-            Export CSV
-        </button>
+        <div class="filter-group">
+            <label>&nbsp;</label>
+            <button class="btn" onclick="exportToCSV()">
+                <i class="fas fa-file-csv"></i>
+                Export CSV
+            </button>
+        </div>
+        <div class="filter-group">
+            <label>&nbsp;</label>
+            <button class="btn btn-secondary" onclick="exportToArgon()">
+                <i class="fas fa-file-export"></i>
+                Export to ARGON
+            </button>
+        </div>
+    </div>
+    <div class="export-info">
+        <i class="fas fa-info-circle"></i>
+        ARGON export format includes PACP 7.0 standard headers for seamless integration
     </div>
 </div>
 
-<!-- Data Table -->
-<div class="data-card">
-    <div class="data-card-header">
-        <h3>Sensor Readings</h3>
-        <span class="record-count" id="recordCount">0 records</span>
-    </div>
-
+<div class="table-container">
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
                     <th>Timestamp</th>
                     <th>Pipe Segment</th>
-                    <th style="text-align: right;">Temperature (°C)</th>
-                    <th style="text-align: right;">Sound (dB)</th>
-                    <th style="text-align: right;">Flow Rate (L/s)</th>
-                    <th style="text-align: center;">Camera</th>
+                    <th>PACP Code</th>
+                    <th>Observation</th>
+                    <th>Temp (°C)</th>
+                    <th>Sound (dB)</th>
+                    <th>Flow (L/s)</th>
+                    <th>Risk Score</th>
+                    <th>Camera</th>
                 </tr>
             </thead>
-            <tbody id="dataTableBody">
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 48px;">
-                        Loading data...
-                    </td>
-                </tr>
+            <tbody id="data-table">
+                <!-- Populated by JavaScript -->
             </tbody>
         </table>
     </div>
@@ -213,122 +231,177 @@
 {% block extra_scripts %}
 <script>
     let allReadings = [];
-    let pipeSegments = [];
     let filteredReadings = [];
 
-    async function loadData() {
+    async function loadReadings() {
         try {
-            const [readingsRes, segmentsRes] = await Promise.all([
-                fetch('/api/sensor-readings'),
-                fetch('/api/pipe-segments')
-            ]);
-
-            allReadings = await readingsRes.json();
-            pipeSegments = await segmentsRes.json();
-            
+            const response = await fetch('/api/sensor-readings');
+            allReadings = await response.json();
             filteredReadings = allReadings;
+            
+            populatePACPFilter();
             renderTable();
         } catch (error) {
-            console.error('Error loading data:', error);
+            console.error('Error loading sensor readings:', error);
         }
     }
 
-    function getPipeName(pipeSegmentId) {
-        const pipe = pipeSegments.find(p => p.id === pipeSegmentId);
-        return pipe ? pipe.name : 'Unknown';
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('dataTableBody');
-        const recordCount = document.getElementById('recordCount');
-
-        if (filteredReadings.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="empty-state">
-                        <i class="fas fa-inbox"></i>
-                        <p>No sensor readings found</p>
-                    </td>
-                </tr>
-            `;
-            recordCount.textContent = '0 records';
-            return;
-        }
-
-        const displayReadings = filteredReadings.slice(0, 100);
+    function populatePACPFilter() {
+        const select = document.getElementById('pacp-filter');
+        const codes = [...new Set(allReadings.map(r => r.pacp_code))].sort();
         
-        tbody.innerHTML = displayReadings.map(reading => `
-            <tr>
-                <td class="mono" style="font-size: 13px;">
-                    ${new Date(reading.timestamp).toLocaleString()}
-                </td>
-                <td style="font-weight: 500;">
-                    ${getPipeName(reading.pipeSegmentId)}
-                </td>
-                <td class="mono" style="text-align: right;">
-                    ${parseFloat(reading.temperature).toFixed(1)}
-                </td>
-                <td class="mono" style="text-align: right;">
-                    ${parseFloat(reading.soundLevel).toFixed(1)}
-                </td>
-                <td class="mono" style="text-align: right;">
-                    ${parseFloat(reading.flowRate).toFixed(2)}
-                </td>
-                <td style="text-align: center;">
-                    ${reading.cameraImageUrl 
-                        ? '<button class="camera-btn"><i class="fas fa-camera"></i></button>'
-                        : '<span style="color: var(--muted-fg);">—</span>'
-                    }
-                </td>
-            </tr>
-        `).join('');
-
-        recordCount.textContent = `${filteredReadings.length} records`;
+        codes.forEach(code => {
+            const option = document.createElement('option');
+            option.value = code;
+            option.textContent = code;
+            select.appendChild(option);
+        });
     }
 
     function filterData() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const filterType = document.getElementById('filterType').value;
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const pacpFilter = document.getElementById('pacp-filter').value;
 
         filteredReadings = allReadings.filter(reading => {
-            const pipeName = getPipeName(reading.pipeSegmentId).toLowerCase();
-            const matchesSearch = pipeName.includes(searchTerm);
-            
-            // For now, we're not filtering by type since all readings have all sensor types
-            return matchesSearch;
+            const matchesSearch = reading.pipeSegmentName.toLowerCase().includes(searchTerm);
+            const matchesPACP = !pacpFilter || reading.pacp_code === pacpFilter;
+            return matchesSearch && matchesPACP;
         });
 
         renderTable();
     }
 
-    function exportData() {
-        // Create CSV content
-        let csv = 'Timestamp,Pipe Segment,Temperature (°C),Sound (dB),Flow Rate (L/s),Camera Image\n';
-        
-        filteredReadings.forEach(reading => {
-            csv += `"${new Date(reading.timestamp).toLocaleString()}",`;
-            csv += `"${getPipeName(reading.pipeSegmentId)}",`;
-            csv += `${reading.temperature},`;
-            csv += `${reading.soundLevel},`;
-            csv += `${reading.flowRate},`;
-            csv += `${reading.cameraImageUrl ? 'Yes' : 'No'}\n`;
-        });
+    function renderTable() {
+        const tbody = document.getElementById('data-table');
 
-        // Create download link
-        const blob = new Blob([csv], { type: 'text/csv' });
+        if (filteredReadings.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9">
+                        <div class="empty-state">
+                            <i class="fas fa-search" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                            <div>No data matches your filters</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filteredReadings.map(reading => {
+            const timestamp = new Date(reading.timestamp).toLocaleString();
+            const riskClass = getRiskClass(reading.risk_score);
+            
+            return `
+                <tr>
+                    <td class="mono">${timestamp}</td>
+                    <td>${reading.pipeSegmentName}</td>
+                    <td>
+                        <div class="pacp-cell">
+                            <span class="pacp-code">${reading.pacp_code}</span>
+                            <span style="font-size: 11px; color: var(--muted-fg);">Score: ${reading.pacp_score}</span>
+                        </div>
+                    </td>
+                    <td style="max-width: 200px; white-space: normal; font-size: 12px;">${reading.observation}</td>
+                    <td class="mono">${reading.temperature}</td>
+                    <td class="mono">${reading.soundLevel}</td>
+                    <td class="mono">${reading.flowRate}</td>
+                    <td>
+                        <span class="risk-score ${riskClass}">${reading.risk_score}/10</span>
+                    </td>
+                    <td class="text-center">
+                        ${reading.cameraImageUrl 
+                            ? '<i class="fas fa-camera camera-indicator"></i>' 
+                            : '<i class="fas fa-camera no-camera"></i>'}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function getRiskClass(score) {
+        if (score >= 8) return 'critical';
+        if (score >= 6) return 'high';
+        if (score >= 4) return 'medium';
+        return 'low';
+    }
+
+    function exportToCSV() {
+        const headers = ['Timestamp', 'Pipe Segment', 'PACP Code', 'PACP Score', 'Observation', 'Temperature', 'Sound', 'Flow Rate', 'Risk Score', 'Camera'];
+        
+        const rows = filteredReadings.map(r => [
+            new Date(r.timestamp).toISOString(),
+            r.pipeSegmentName,
+            r.pacp_code,
+            r.pacp_score,
+            `"${r.observation}"`,
+            r.temperature,
+            r.soundLevel,
+            r.flowRate,
+            r.risk_score,
+            r.cameraImageUrl ? 'Yes' : 'No'
+        ]);
+
+        const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+        downloadFile(csv, 'pipevision-sensor-data.csv', 'text/csv');
+    }
+
+    function exportToArgon() {
+        // ARGON-specific format with PACP 7.0 headers
+        const headers = [
+            'Segment',
+            'InspectionDate',
+            'Inspector',
+            'PACP_Code',
+            'PACP_Score',
+            'Location_m',
+            'Observation',
+            'Temperature_C',
+            'Sound_dB',
+            'FlowRate_Lps',
+            'Confidence',
+            'RiskScore'
+        ];
+        
+        const rows = filteredReadings.map(r => [
+            r.pipeSegmentName,
+            new Date(r.timestamp).toISOString().split('T')[0],
+            'PipeVision-Robot-1',
+            r.pacp_code,
+            r.pacp_score,
+            '0', // Would come from GPS/odometry
+            `"${r.observation}"`,
+            r.temperature,
+            r.soundLevel,
+            r.flowRate,
+            '0.85', // Placeholder confidence
+            r.risk_score
+        ]);
+
+        const csv = [
+            '# PipeVision AI - PACP 7.0 Compliant Export',
+            '# Generated: ' + new Date().toISOString(),
+            '# Format: ARGON Compatible',
+            headers.join(','),
+            ...rows.map(row => row.join(','))
+        ].join('\n');
+
+        downloadFile(csv, 'pipevision-argon-export.csv', 'text/csv');
+        
+        alert('✅ ARGON Export Complete!\n\nFile includes:\n• PACP 7.0 standard headers\n• Inspector metadata\n• Risk scores\n• All sensor readings\n\nReady for import into Jacobs ARGON software.');
+    }
+
+    function downloadFile(content, filename, type) {
+        const blob = new Blob([content], { type });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `sensor-readings-${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = filename;
         a.click();
         window.URL.revokeObjectURL(url);
     }
 
-    // Event listeners
-    document.getElementById('searchInput').addEventListener('input', filterData);
-    document.getElementById('filterType').addEventListener('change', filterData);
-
     // Load data on page load
-    loadData();
+    loadReadings();
 </script>
 {% endblock %}

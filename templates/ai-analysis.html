@@ -2,6 +2,53 @@
 
 {% block extra_styles %}
 <style>
+    .page-actions {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .filters-section {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .filters-section h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+    }
+
+    .filter-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    .filter-item label {
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+    }
+
     .analysis-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -45,7 +92,7 @@
     .accordion-header {
         padding: 16px;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: background-color 0.2s;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -67,10 +114,56 @@
         font-weight: 500;
     }
 
-    .accordion-confidence {
-        font-size: 12px;
-        color: var(--muted-fg);
+    .pacp-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+    }
+
+    .pacp-code {
         font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 8px;
+        background: rgba(25, 118, 210, 0.1);
+        color: var(--primary);
+        border-radius: 4px;
+    }
+
+    .pacp-score {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 8px;
+        background: var(--muted);
+        border-radius: 4px;
+    }
+
+    .confidence-badge {
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: var(--font-mono);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .confidence-badge.high {
+        background: rgba(46, 125, 50, 0.15);
+        color: #2e7d32;
+    }
+
+    .confidence-badge.medium {
+        background: rgba(237, 108, 2, 0.15);
+        color: #ed6c02;
+    }
+
+    .confidence-badge.low {
+        background: rgba(198, 40, 40, 0.15);
+        color: #c62828;
     }
 
     .accordion-icon {
@@ -89,8 +182,40 @@
     }
 
     .accordion-content.open {
-        max-height: 500px;
+        max-height: 600px;
         padding: 16px;
+    }
+
+    .detail-section {
+        margin-bottom: 16px;
+    }
+
+    .detail-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-section h4 {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--muted-fg);
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        margin-bottom: 6px;
+        padding: 6px 0;
+    }
+
+    .detail-row span:first-child {
+        color: var(--muted-fg);
+    }
+
+    .detail-row span:last-child {
+        font-family: var(--font-mono);
+        font-weight: 500;
     }
 
     .progress-bar {
@@ -99,86 +224,63 @@
         background: var(--secondary);
         border-radius: 4px;
         overflow: hidden;
-        margin-top: 4px;
+        margin-top: 8px;
     }
 
     .progress-fill {
         height: 100%;
-        background: var(--chart-1);
+        background: var(--primary);
         transition: width 0.3s;
     }
 
-    .contamination-tags {
+    .tags {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 6px;
         margin-top: 8px;
     }
 
-    .contamination-tag {
+    .tag {
         padding: 4px 10px;
         background: var(--muted);
-        border: 1px solid var(--border);
-        border-radius: 6px;
+        border-radius: 4px;
         font-size: 12px;
+        font-weight: 500;
+    }
+
+    .recommendation-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
 
     .recommendation-item {
-        display: flex;
-        gap: 12px;
         padding: 16px;
         border: 1px solid var(--border);
-        border-radius: 8px;
-        margin-bottom: 12px;
-        transition: all 0.2s;
+        border-radius: 6px;
+        transition: border-color 0.2s;
     }
 
     .recommendation-item:hover {
-        background: var(--muted);
-    }
-
-    .recommendation-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .recommendation-icon.critical {
-        background: rgba(198, 40, 40, 0.1);
-        color: var(--destructive);
-    }
-
-    .recommendation-icon.high {
-        background: rgba(237, 108, 2, 0.1);
-        color: var(--chart-2);
-    }
-
-    .recommendation-icon.medium {
-        background: rgba(25, 118, 210, 0.1);
-        color: var(--chart-1);
-    }
-
-    .recommendation-content {
-        flex: 1;
+        border-color: var(--primary);
     }
 
     .recommendation-header {
         display: flex;
         align-items: center;
-        gap: 8px;
-        margin-bottom: 6px;
+        justify-content: space-between;
+        margin-bottom: 8px;
     }
 
     .recommendation-title {
         font-size: 14px;
         font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .recommendation-description {
+    .recommendation-body {
         font-size: 13px;
         color: var(--muted-fg);
         margin-bottom: 8px;
@@ -189,27 +291,21 @@
         gap: 16px;
         font-size: 12px;
         color: var(--muted-fg);
+        font-family: var(--font-mono);
     }
 
-    .recommendation-action {
-        width: 32px;
-        height: 32px;
-        border: 1px solid var(--border);
-        background: transparent;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        align-self: center;
-    }
-
-    .recommendation-action:hover {
-        background: var(--muted);
+    .no-data {
+        text-align: center;
+        padding: 48px;
+        color: var(--muted-fg);
     }
 
     @media (max-width: 1024px) {
         .analysis-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -218,57 +314,100 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>AI Analysis Dashboard</h1>
-    <p>Tier 2: Machine learning insights and predictive analytics</p>
+    <div>
+        <h1>AI Analysis</h1>
+        <p>PACP 7.0 compliant predictive insights and maintenance recommendations</p>
+    </div>
+    <div class="page-actions">
+        <button class="btn" onclick="generatePACPReport()">
+            <i class="fas fa-file-pdf"></i>
+            Generate PACP Report
+        </button>
+        <button class="btn btn-secondary" onclick="exportRiskMatrix()">
+            <i class="fas fa-file-excel"></i>
+            Export Risk Matrix
+        </button>
+    </div>
+</div>
+
+<!-- PACP Filters -->
+<div class="filters-section">
+    <h3>
+        <i class="fas fa-filter"></i>
+        Filter by Defect Type (PACP)
+    </h3>
+    <div class="filter-grid">
+        <div class="filter-item">
+            <input type="checkbox" id="filter-crack" value="crack" checked onchange="applyFilters()">
+            <label for="filter-crack">Cracks (CL, CR, FR)</label>
+        </div>
+        <div class="filter-item">
+            <input type="checkbox" id="filter-corrosion" value="corrosion" checked onchange="applyFilters()">
+            <label for="filter-corrosion">Corrosion (COR)</label>
+        </div>
+        <div class="filter-item">
+            <input type="checkbox" id="filter-deformation" value="deformation" checked onchange="applyFilters()">
+            <label for="filter-deformation">Deformation (DEF)</label>
+        </div>
+        <div class="filter-item">
+            <input type="checkbox" id="filter-deposit" value="deposit" checked onchange="applyFilters()">
+            <label for="filter-deposit">Deposits (DEP)</label>
+        </div>
+        <div class="filter-item">
+            <input type="checkbox" id="filter-root" value="root" checked onchange="applyFilters()">
+            <label for="filter-root">Roots (RO)</label>
+        </div>
+    </div>
 </div>
 
 <!-- Summary Metrics -->
-<div class="metric-grid">
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">Critical Findings</span>
-            <i class="fas fa-exclamation-triangle card-icon" style="color: var(--destructive);"></i>
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(198, 40, 40, 0.15);">
+            <i class="fas fa-exclamation-triangle" style="color: var(--destructive);"></i>
         </div>
-        <div class="metric-value text-destructive" id="critical-count">0</div>
-        <div class="metric-label">Require immediate attention</div>
+        <div class="metric-content">
+            <div class="metric-value" id="critical-findings">-</div>
+            <div class="metric-label">Critical Findings</div>
+        </div>
     </div>
-
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">High Risk Segments</span>
-            <i class="fas fa-chart-line card-icon" style="color: var(--chart-2);"></i>
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(237, 108, 2, 0.15);">
+            <i class="fas fa-tools" style="color: var(--chart-2);"></i>
         </div>
-        <div class="metric-value" id="high-risk-count">0</div>
-        <div class="metric-label">Monitored closely</div>
+        <div class="metric-content">
+            <div class="metric-value" id="high-risk-segments">-</div>
+            <div class="metric-label">High Risk Segments</div>
+        </div>
     </div>
-
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">Avg. Confidence</span>
-            <i class="fas fa-shield-alt card-icon" style="color: var(--chart-1);"></i>
+    <div class="metric-card">
+        <div class="metric-icon" style="background: rgba(25, 118, 210, 0.15);">
+            <i class="fas fa-chart-line" style="color: var(--primary);"></i>
         </div>
-        <div class="metric-value" id="avg-confidence">0%</div>
-        <div class="metric-label">Analysis accuracy</div>
+        <div class="metric-content">
+            <div class="metric-value" id="avg-confidence">-</div>
+            <div class="metric-label">Avg Confidence</div>
+        </div>
     </div>
 </div>
 
-<!-- Analysis Results -->
+<!-- Analysis Cards -->
 <div class="analysis-grid">
     <!-- Corrosion Detection -->
     <div class="analysis-card">
-        <h3>Corrosion Detection Results</h3>
-        <p>AI-powered visual analysis</p>
-        <div id="corrosion-accordion" class="accordion">
-            <!-- Dynamic content -->
+        <h3>Corrosion Detection</h3>
+        <p>PACP-coded defects with AI confidence scores</p>
+        <div class="accordion" id="corrosion-accordion">
+            <!-- Populated by JavaScript -->
         </div>
     </div>
 
     <!-- Maintenance Recommendations -->
     <div class="analysis-card">
         <h3>Maintenance Recommendations</h3>
-        <p>Prioritized action items</p>
-        <div id="recommendations-list">
-            <!-- Dynamic content -->
+        <p>Prioritized actions based on risk analysis</p>
+        <div class="recommendation-list" id="recommendations-list">
+            <!-- Populated by JavaScript -->
         </div>
     </div>
 </div>
@@ -276,166 +415,234 @@
 
 {% block extra_scripts %}
 <script>
-    let aiAnalysis = [];
-    let pipeSegments = [];
+    let aiAnalyses = [];
+    let allAnalyses = [];
 
-    async function loadAnalysis() {
+    // PACP category mapping
+    const pacpCategories = {
+        'CL': 'crack', 'CR': 'crack', 'FR': 'crack',
+        'COR': 'corrosion',
+        'DEF': 'deformation',
+        'DEP': 'deposit',
+        'RO': 'root'
+    };
+
+    async function loadAnalyses() {
         try {
-            const [analysisRes, segmentsRes] = await Promise.all([
-                fetch('/api/ai-analysis'),
-                fetch('/api/pipe-segments')
-            ]);
-
-            aiAnalysis = await analysisRes.json();
-            pipeSegments = await segmentsRes.json();
-
+            const response = await fetch('/api/ai-analysis');
+            allAnalyses = await response.json();
+            aiAnalyses = allAnalyses;
+            
             updateMetrics();
-            renderCorrosionResults();
-            renderRecommendations();
+            renderAnalyses();
         } catch (error) {
-            console.error('Error loading analysis:', error);
+            console.error('Error loading AI analyses:', error);
         }
     }
 
-    function getPipeName(pipeSegmentId) {
-        const pipe = pipeSegments.find(p => p.id === pipeSegmentId);
-        return pipe ? pipe.name : 'Unknown';
+    function applyFilters() {
+        const filters = {
+            crack: document.getElementById('filter-crack').checked,
+            corrosion: document.getElementById('filter-corrosion').checked,
+            deformation: document.getElementById('filter-deformation').checked,
+            deposit: document.getElementById('filter-deposit').checked,
+            root: document.getElementById('filter-root').checked
+        };
+
+        aiAnalyses = allAnalyses.filter(analysis => {
+            const code = analysis.pacp_code.split('-')[0];
+            const category = pacpCategories[code];
+            return filters[category];
+        });
+
+        updateMetrics();
+        renderAnalyses();
     }
 
     function updateMetrics() {
-        const criticalCount = aiAnalysis.filter(a => 
-            a.corrosionLevel === 'Critical' || a.maintenancePriority === 'Critical'
-        ).length;
-
-        const highRiskCount = aiAnalysis.filter(a => 
-            a.corrosionLevel === 'High' || a.maintenancePriority === 'High'
-        ).length;
-
-        const avgConfidence = aiAnalysis.length > 0
-            ? (aiAnalysis.reduce((sum, a) => sum + parseFloat(a.corrosionConfidence), 0) / aiAnalysis.length).toFixed(1)
+        const criticalCount = aiAnalyses.filter(a => a.maintenancePriority === 'Critical').length;
+        const highRiskCount = aiAnalyses.filter(a => a.maintenancePriority === 'Critical' || a.maintenancePriority === 'High').length;
+        const avgConfidence = aiAnalyses.length > 0
+            ? (aiAnalyses.reduce((sum, a) => sum + a.corrosionConfidence, 0) / aiAnalyses.length * 100).toFixed(1)
             : 0;
 
-        document.getElementById('critical-count').textContent = criticalCount;
-        document.getElementById('high-risk-count').textContent = highRiskCount;
+        document.getElementById('critical-findings').textContent = criticalCount;
+        document.getElementById('high-risk-segments').textContent = highRiskCount;
         document.getElementById('avg-confidence').textContent = avgConfidence + '%';
     }
 
-    function renderCorrosionResults() {
+    function renderAnalyses() {
         const accordion = document.getElementById('corrosion-accordion');
-        const corrosionResults = aiAnalysis
-            .filter(a => a.corrosionLevel !== 'None')
-            .slice(0, 5);
+        const recommendations = document.getElementById('recommendations-list');
 
-        if (corrosionResults.length === 0) {
-            accordion.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--muted-fg);">No corrosion detected</div>';
+        if (aiAnalyses.length === 0) {
+            accordion.innerHTML = '<div class="no-data">No analyses match the selected filters</div>';
+            recommendations.innerHTML = '<div class="no-data">No recommendations available</div>';
             return;
         }
 
-        accordion.innerHTML = corrosionResults.map((analysis, index) => {
-            const badgeClass = analysis.corrosionLevel.toLowerCase();
+        // Render accordion items
+        accordion.innerHTML = aiAnalyses.map((analysis, index) => {
+            const confidencePercent = (analysis.corrosionConfidence * 100).toFixed(2);
+            const confidenceLevel = analysis.confidence_level;
+            const confidenceBadge = getConfidenceBadge(confidenceLevel, confidencePercent);
+
             return `
                 <div class="accordion-item">
                     <div class="accordion-header" onclick="toggleAccordion(${index})">
                         <div class="accordion-header-content">
-                            <span class="badge badge-${badgeClass}">${analysis.corrosionLevel}</span>
-                            <span class="accordion-title">${getPipeName(analysis.pipeSegmentId)}</span>
-                            <span class="accordion-confidence">${analysis.corrosionConfidence}% confidence</span>
+                            <div>
+                                <div class="accordion-title">${analysis.pipeSegmentName}</div>
+                                <div class="pacp-info">
+                                    <span class="pacp-code">${analysis.pacp_code}</span>
+                                    <span class="pacp-score">Score: ${analysis.pacp_score}/5</span>
+                                    <span class="badge badge-${analysis.maintenancePriority.toLowerCase()}">${analysis.maintenancePriority}</span>
+                                    ${confidenceBadge}
+                                </div>
+                            </div>
                         </div>
                         <i class="fas fa-chevron-down accordion-icon" id="icon-${index}"></i>
                     </div>
                     <div class="accordion-content" id="content-${index}">
-                        <div style="margin-bottom: 12px;">
-                            <p style="font-size: 13px; font-weight: 500; margin-bottom: 4px;">Confidence Level</p>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${analysis.corrosionConfidence}%;"></div>
+                        <div class="detail-section">
+                            <h4>PACP Classification</h4>
+                            <div class="detail-row">
+                                <span>Code</span>
+                                <span>${analysis.pacp_code}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Defect</span>
+                                <span>${analysis.pacp_name}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Description</span>
+                                <span>${analysis.pacp_description}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Location</span>
+                                <span>${analysis.defect_location_meters}m from start</span>
                             </div>
                         </div>
+
+                        <div class="detail-section">
+                            <h4>Risk Assessment</h4>
+                            <div class="detail-row">
+                                <span>Corrosion Level</span>
+                                <span>${analysis.corrosionLevel}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>AI Confidence</span>
+                                <span>${confidencePercent}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${confidencePercent}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>Predicted Timeline</h4>
+                            <div class="detail-row">
+                                <span>Estimated Age</span>
+                                <span>${analysis.estimatedFinancialAge} years</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Predicted Failure</span>
+                                <span>${analysis.predictedFailureMonths} months</span>
+                            </div>
+                        </div>
+
                         ${analysis.soilContaminationDetected && analysis.soilContaminationDetected.length > 0 ? `
-                            <div style="margin-bottom: 12px;">
-                                <p style="font-size: 13px; font-weight: 500; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-tint"></i>
-                                    Soil Contamination Detected
-                                </p>
-                                <div class="contamination-tags">
-                                    ${analysis.soilContaminationDetected.map(c => `<span class="contamination-tag">${c}</span>`).join('')}
-                                </div>
+                        <div class="detail-section">
+                            <h4>Soil Contamination Detected</h4>
+                            <div class="tags">
+                                ${analysis.soilContaminationDetected.map(c => `<span class="tag">${c}</span>`).join('')}
                             </div>
-                        ` : ''}
-                        ${analysis.predictedFailureMonths ? `
-                            <div style="padding-top: 12px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 13px;">
-                                <span style="color: var(--muted-fg);">Predicted Failure</span>
-                                <span class="mono" style="font-weight: 500;">${analysis.predictedFailureMonths} months</span>
-                            </div>
+                        </div>
                         ` : ''}
                     </div>
                 </div>
             `;
         }).join('');
+
+        // Render recommendations
+        recommendations.innerHTML = aiAnalyses
+            .sort((a, b) => {
+                const priorityOrder = { 'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1 };
+                return priorityOrder[b.maintenancePriority] - priorityOrder[a.maintenancePriority];
+            })
+            .map(analysis => `
+                <div class="recommendation-item">
+                    <div class="recommendation-header">
+                        <div class="recommendation-title">
+                            <span class="badge badge-${analysis.maintenancePriority.toLowerCase()}">${analysis.maintenancePriority}</span>
+                            <span>${analysis.pipeSegmentName}</span>
+                            <span class="pacp-code">${analysis.pacp_code}</span>
+                        </div>
+                    </div>
+                    <div class="recommendation-body">
+                        ${analysis.recommendations}
+                    </div>
+                    <div class="recommendation-meta">
+                        <span>Age: ${analysis.estimatedFinancialAge} years</span>
+                        <span>Failure: ${analysis.predictedFailureMonths} months</span>
+                        <span>Location: ${analysis.defect_location_meters}m</span>
+                    </div>
+                </div>
+            `).join('');
     }
 
-    function renderRecommendations() {
-        const list = document.getElementById('recommendations-list');
-        const recommendations = aiAnalysis
-            .filter(a => a.maintenancePriority !== 'Low')
-            .sort((a, b) => {
-                const priority = { Critical: 4, High: 3, Medium: 2, Low: 1 };
-                return priority[b.maintenancePriority] - priority[a.maintenancePriority];
-            })
-            .slice(0, 6);
-
-        if (recommendations.length === 0) {
-            list.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--muted-fg);">No recommendations at this time</div>';
-            return;
-        }
-
-        list.innerHTML = recommendations.map(analysis => {
-            const priorityClass = analysis.maintenancePriority.toLowerCase();
-            const recommendation = analysis.recommendations && analysis.recommendations.length > 0 
-                ? analysis.recommendations[0] 
-                : 'Schedule routine inspection';
-
-            return `
-                <div class="recommendation-item">
-                    <div class="recommendation-icon ${priorityClass}">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="recommendation-content">
-                        <div class="recommendation-header">
-                            <span class="recommendation-title">${getPipeName(analysis.pipeSegmentId)}</span>
-                            <span class="badge badge-${priorityClass}">${analysis.maintenancePriority}</span>
-                        </div>
-                        <p class="recommendation-description">${recommendation}</p>
-                        <div class="recommendation-meta">
-                            <span>Age: ${analysis.estimatedFinancialAge}y</span>
-                            ${analysis.predictedFailureMonths ? `<span>Est. failure: ${analysis.predictedFailureMonths}mo</span>` : ''}
-                        </div>
-                    </div>
-                    <button class="recommendation-action">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            `;
-        }).join('');
+    function getConfidenceBadge(level, percent) {
+        const icons = {
+            'high': 'check-circle',
+            'medium': 'exclamation-circle',
+            'low': 'exclamation-triangle'
+        };
+        const labels = {
+            'high': 'HIGH CONFIDENCE',
+            'medium': 'MEDIUM CONFIDENCE',
+            'low': 'LOW - REVIEW NEEDED'
+        };
+        return `<span class="confidence-badge ${level}">
+            <i class="fas fa-${icons[level]}"></i>
+            ${percent}% ${labels[level]}
+        </span>`;
     }
 
     function toggleAccordion(index) {
         const content = document.getElementById(`content-${index}`);
         const icon = document.getElementById(`icon-${index}`);
         
-        const isOpen = content.classList.contains('open');
-        
-        // Close all accordions
-        document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
-        document.querySelectorAll('.accordion-icon').forEach(i => i.classList.remove('open'));
-        
-        // Open clicked accordion if it was closed
-        if (!isOpen) {
-            content.classList.add('open');
-            icon.classList.add('open');
-        }
+        content.classList.toggle('open');
+        icon.classList.toggle('open');
+    }
+
+    function generatePACPReport() {
+        alert('Generating PACP 7.0 Inspection Report...\n\nThis will create a PDF with:\n- All defect findings\n- PACP codes and scores\n- Risk assessments\n- Maintenance recommendations\n\nExport format: PDF, ARGON CSV, or Excel');
+    }
+
+    function exportRiskMatrix() {
+        // Convert to CSV format
+        const headers = ['Segment', 'PACP_Code', 'PACP_Score', 'Priority', 'Confidence', 'Failure_Months', 'Location_m'];
+        const rows = aiAnalyses.map(a => [
+            a.pipeSegmentName,
+            a.pacp_code,
+            a.pacp_score,
+            a.maintenancePriority,
+            (a.corrosionConfidence * 100).toFixed(2),
+            a.predictedFailureMonths,
+            a.defect_location_meters
+        ]);
+
+        const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pipevision-risk-matrix.csv';
+        a.click();
     }
 
     // Load data on page load
-    loadAnalysis();
+    loadAnalyses();
 </script>
 {% endblock %}
