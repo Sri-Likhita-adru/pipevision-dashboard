@@ -255,20 +255,40 @@ def get_metrics():
     
     high_risk_count = len([p for p in pipe_segments if p['quality'] == 'Poor'])
     
+    # Calculate average quality
+    quality_scores = {'Great': 4, 'Good': 3, 'Fair': 2, 'Poor': 1}
+    avg_quality_score = sum(quality_scores[p['quality']] for p in pipe_segments) / len(pipe_segments)
+    if avg_quality_score >= 3.5:
+        avg_quality = 'Great'
+    elif avg_quality_score >= 2.5:
+        avg_quality = 'Good'
+    elif avg_quality_score >= 1.5:
+        avg_quality = 'Fair'
+    else:
+        avg_quality = 'Poor'
+    
     return jsonify({
         'totalPipeLength': total_length,
         'averageAge': avg_age,
+        'averageQuality': avg_quality,
         'qualityDistribution': quality_counts,
+        'qualityBreakdown': {
+            'great': quality_counts['Great'],
+            'good': quality_counts['Good'],
+            'fair': quality_counts['Fair'],
+            'poor': quality_counts['Poor']
+        },
         'highRiskSegments': high_risk_count
     })
 
 @app.route('/api/recent-activity')
 def get_recent_activity():
+    activity_types = ['inspection', 'maintenance', 'alert', 'analysis']
     activities = [
         {
             'id': f'activity-{i}',
-            'type': random.choice(['inspection', 'maintenance', 'alert']),
-            'message': f'Inspection completed on {random.choice(pipe_segments)["name"]}',
+            'activityType': random.choice(activity_types),
+            'description': f'Inspection completed on {random.choice(pipe_segments)["name"]}',
             'timestamp': (datetime.now() - timedelta(hours=random.randint(1, 120))).isoformat()
         }
         for i in range(5)
